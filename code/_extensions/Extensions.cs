@@ -9,6 +9,22 @@ public static class Extensions
 {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /********************
+     * Vector2  *
+     ********************/
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Returns a new Vector3 with an extra z parameter
+    /// </summary>
+    /// <param name="_Vec"></param>
+    /// /// <param name="_Z"></param>
+    /// <returns></returns>
+    public static Vector3 newVector3(this Vector2 _Vec, float _Z)
+    {
+        return new Vector3(_Vec.x, _Vec.y, _Z);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /********************
      * ANIMATOR  *
      ********************/
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,6 +41,31 @@ public static class Extensions
             if (param.name == _ParamName) return true;
         }
         return false;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /********************
+     * CAMERA  *
+     ********************/
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Returns the orthographic camera bounds
+    /// </summary>
+    /// <param name="_Camera"></param>
+    /// <returns></returns>
+    public static Bounds OrthographicBounds(this Camera _Camera)
+    {
+        if (!_Camera.orthographic)
+        {
+            Debug.Log(string.Format("The camera {0} is not Orthographic!", _Camera.name), _Camera);
+            return new Bounds();
+        }
+
+        Transform camTrans = _Camera.transform;
+        float scaleWidthFactor = (float)Screen.currentResolution.width / (float)Screen.currentResolution.height;
+        float height = _Camera.orthographicSize * 2f;
+        float width = height * scaleWidthFactor;
+
+        return new Bounds(new Vector3(camTrans.position.x, camTrans.position.y, 0), new Vector3(width, height, 0));
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
