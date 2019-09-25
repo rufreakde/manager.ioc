@@ -16,11 +16,93 @@ public static class Extensions
     /// Returns a new Vector3 with an extra z parameter
     /// </summary>
     /// <param name="_Vec"></param>
-    /// /// <param name="_Z"></param>
+    /// <param name="_Z"></param>
     /// <returns></returns>
     public static Vector3 newVector3(this Vector2 _Vec, float _Z)
     {
         return new Vector3(_Vec.x, _Vec.y, _Z);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /********************
+     * Rect  *
+     ********************/
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Returns min(x)Max(y) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector2 minMax(this Rect _Rect)
+    {
+        return new Vector2(_Rect.xMin, _Rect.yMax);
+    }
+
+    /// <summary>
+    /// Returns max(x)Min(y) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector2 maxMin(this Rect _Rect)
+    {
+        return new Vector2(_Rect.xMax, _Rect.yMin);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /********************
+     * Bounds  *
+     ********************/
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>
+    /// Returns min(x)Max(y)Min(z) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3 minMaxMin(this Bounds _Bounds)
+    {
+        return new Vector3(_Bounds.min.x, _Bounds.max.y, _Bounds.min.z);
+    }
+
+    /// <summary>
+    /// Returns max(x)Min(y)Min(z) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3 maxMinMin(this Bounds _Bounds)
+    {
+        return new Vector3(_Bounds.max.x, _Bounds.min.y, _Bounds.min.z);
+    }
+
+    /// <summary>
+    /// Returns max(x)Min(y)Max(z) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3 minMaxMax(this Bounds _Bounds)
+    {
+        return new Vector3(_Bounds.min.x, _Bounds.max.y, _Bounds.max.z);
+    }
+
+    /// <summary>
+    /// Returns max(x)Min(y)Max(z) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3 maxMinMax(this Bounds _Bounds)
+    {
+        return new Vector3(_Bounds.max.x, _Bounds.min.y, _Bounds.max.z);
+    }
+
+    /// <summary>
+    /// Returns max(x)Min(y)Max(z) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3 minMinMax(this Bounds _Bounds)
+    {
+        return new Vector3(_Bounds.min.x, _Bounds.min.y, _Bounds.max.z);
+    }
+
+    /// <summary>
+    /// Returns max(x)Min(y)Max(z) corner
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3 maxMaxMin(this Bounds _Bounds)
+    {
+        return new Vector3(_Bounds.max.x, _Bounds.max.y, _Bounds.min.z);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,8 +146,30 @@ public static class Extensions
         float scaleWidthFactor = (float)Screen.currentResolution.width / (float)Screen.currentResolution.height;
         float height = _Camera.orthographicSize * 2f;
         float width = height * scaleWidthFactor;
+        float viewDepth = _Camera.farClipPlane - _Camera.nearClipPlane;
 
-        return new Bounds(new Vector3(camTrans.position.x, camTrans.position.y, 0), new Vector3(width, height, 0));
+        return new Bounds(new Vector3(camTrans.position.x, camTrans.position.y, camTrans.position.z), new Vector3(width, height, viewDepth));
+    }
+
+    /// <summary>
+    /// Returns the orthographic camera rect (without z)
+    /// </summary>
+    /// <param name="_Camera"></param>
+    /// <returns></returns>
+    public static Rect OrthographicRect(this Camera _Camera)
+    {
+        if (!_Camera.orthographic)
+        {
+            Debug.Log(string.Format("The camera {0} is not Orthographic!", _Camera.name), _Camera);
+            return new Rect();
+        }
+
+        Transform camTrans = _Camera.transform;
+        float scaleWidthFactor = (float)Screen.currentResolution.width / (float)Screen.currentResolution.height;
+        float height = _Camera.orthographicSize * 2f;
+        float width = height * scaleWidthFactor;
+
+        return new Rect(new Vector2(camTrans.position.x - (width*0.5f), camTrans.position.y - (height * 0.5f)), new Vector2(width, height));
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
