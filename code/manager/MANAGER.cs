@@ -2,6 +2,7 @@
 using Type = System.Type;
 using Object = UnityEngine.Object;
 using minimap.rts.twod;
+using players.rts;
 
 /*
 NOTE: 
@@ -34,6 +35,7 @@ namespace manager.ioc
             if (DEBUG)
                 Debug.Log("Init all Managers...");
 
+            AddS(typeof(PlayerManager));
             AddS(typeof(MinimapManager));
 
             if (DEBUG)
@@ -144,7 +146,7 @@ namespace manager.ioc
             }
 
             if (Singletons.ContainsKey(_KEY))
-                Singletons.ChangeValue(_KEY, tObj);
+                Singletons.set(_KEY, tObj);
             else
                 Singletons.Add(_KEY, tObj);
 

@@ -20,10 +20,10 @@ namespace manager.ioc
     public class CustomDict<Key, Value>
     {
         [SerializeField]
-        private List<Key> keys = new List<Key>();
+        protected List<Key> keys = new List<Key>();
 
         [SerializeField]
-        private List<Value> values = new List<Value>();
+        protected List<Value> values = new List<Value>();
 
         public int Count
         {
@@ -81,8 +81,7 @@ namespace manager.ioc
         {
             if (keys.Count != values.Count)
             {
-                keys.Clear();
-                values.Clear();
+                Debug.LogError("Dictionary already contains key! " + key.ToString());
                 value = default(Value);
                 return false;
             }
@@ -99,7 +98,7 @@ namespace manager.ioc
             return true;
         }
 
-        int count()
+        protected int count()
         {
             if(keys.Count != values.Count)
                 Debug.LogError("Error " + this.ToString() + " does not have the same key and value count! " + keys.Count + " notEquals " + values.Count );
@@ -107,14 +106,17 @@ namespace manager.ioc
             return values.Count;
         }
 
-        public void ChangeValue(Key key, Value value)
+        public void set(Key key, Value value)
         {
-            if (!keys.Contains(key))
-                return;
-
-            int index = keys.IndexOf(key);
-
-            values[index] = value;
+            if (keys.Contains(key))
+            {
+                int index = keys.IndexOf(key);
+                values[index] = value;
+            }
+            else
+            {
+                Add(key, value);
+            }
         }
     }
 }
