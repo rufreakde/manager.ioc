@@ -37,10 +37,21 @@ public class AutoAssignDrawer : PropertyDrawer
             Rect Pos1 = new Rect (_Position.x, _Position.y, ButtonWidth, _Position.height);
             Rect Pos2 = new Rect (_Position.x + ButtonWidth, _Position.y, _Position.width - ButtonWidth, _Position.height);
             //default assignable property
-            if (GUI.Button(Pos1, "manuel"))
+            if (EditorApplication.isPlaying)
             {
-                Attribute.Auto = true;
-                _Property.objectReferenceValue = null;
+                if (GUI.Button(Pos1, "set"))
+                {
+                    Attribute.Auto = true;
+                    _Property.objectReferenceValue = null;
+                }
+            }
+            else
+            {
+                if (GUI.Button(Pos1, "manuel"))
+                {
+                    Attribute.Auto = true;
+                    _Property.objectReferenceValue = null;
+                }
             }
             EditorGUI.PropertyField(Pos2, _Property);
         }
