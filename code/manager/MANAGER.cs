@@ -60,6 +60,51 @@ namespace manager.ioc
             }
         }
 
+        /// <summary>
+        /// Searches by tag for a GameObject and returns it. If no GameObject is found it will create the provided _DefualtPrefab as a child of MANAGER.
+        /// </summary>
+        /// <param name="_TagOfHolder"></param>
+        /// <param name="_DefaultPrefab"></param>
+        /// <returns></returns>
+        public static GameObject CheckGameObjectAvailability(string _TagOfHolder, GameObject _DefaultPrefab)
+        {
+            GameObject ScriptHolder = null;
+
+            try
+            {
+                ScriptHolder = GameObject.FindWithTag(_TagOfHolder);
+            }
+            catch (UnityException _Exception)
+            {
+                Debug.LogError(_Exception);
+            }
+
+            if (ScriptHolder == null)
+            {
+                ScriptHolder = GameObject.Instantiate(_DefaultPrefab, _DefaultPrefab.transform.position, _DefaultPrefab.transform.rotation) as GameObject;
+                ScriptHolder.name = ScriptHolder.name.Split('(')[0]; // "(Clone)" suffix... is annoying here since this happens in the init
+                ScriptHolder.transform.SetParent(MANAGER.GET.transform);
+            }
+
+            return ScriptHolder;
+        }
+
+        /// <summary>
+        /// Searches by tag for a GameObject and then through all its children to get provided script. If no GameObject is found it will create the provided _DefualtPrefab as a child of MANAGER.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="_TagOfHolder"></param>
+        /// <param name="_DefaultPrefab"></param>
+        /// <returns></returns>
+        public static T CheckScriptAvailability<T>(string _TagOfHolder, GameObject _DefaultPrefab)
+        {
+
+            GameObject ScriptHolder = MANAGER.CheckGameObjectAvailability(_TagOfHolder, _DefaultPrefab);
+
+            T Script = ScriptHolder.GetComponentInChildren<T>();
+            return Script;
+        }
+
         public void ClearDictionary()
         {
             Singletons.Clear();

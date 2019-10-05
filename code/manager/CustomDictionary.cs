@@ -17,7 +17,7 @@ namespace manager.ioc
     /// <typeparam name="Key"></typeparam>
     /// <typeparam name="Value"></typeparam>
     [System.Serializable]
-    public class CustomDict<Key, Value>
+    public class CustomDict<Key, Value> : IEnumerable<Value>
     {
         [SerializeField]
         protected List<Key> keys = new List<Key>();
@@ -40,6 +40,16 @@ namespace manager.ioc
             get { return values; }
         }
 
+        public IEnumerator<Value> GetEnumerator()
+        {
+            return values.GetEnumerator(); ;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         public bool ContainsKey(Key key)
         {
             if (keys.Contains(key))
@@ -54,6 +64,19 @@ namespace manager.ioc
             {
                 Debug.LogError("Dictionary already contains key! " + key.ToString());
                 return;
+            }
+
+            keys.Add(key);
+            values.Add(value);
+        }
+
+        public void AddOrReplace(Key key, Value value)
+        {
+            if (!keys.Contains(key))
+            {
+                int index = keys.IndexOf(key);
+                keys.RemoveAt(index);
+                values.RemoveAt(index);
             }
 
             keys.Add(key);
