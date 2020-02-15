@@ -21,8 +21,20 @@ public interface IJsonDeserialize<T>
     bool deserializationCheck(); // should check if deserialization bool is set to finished
 }
 
+
+
 public static class ObjectExtension
 {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /********************
+     * Reflection to get a property from string name  *
+     ********************/
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static object GetPropValue(this string _PropertyName, object _Source)
+    {
+        return _Source.GetType().GetProperty(_PropertyName).GetValue(_Source, null);
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /********************
      * JSON Object De/Serialization  *
@@ -43,7 +55,7 @@ public static class ObjectExtension
         };
 
         var json = JsonConvert.SerializeObject(_Object, setting);
-        var path = Path.Combine(Application.dataPath, _RelativePath);
+        var path = Path.Combine(Application.streamingAssetsPath, _RelativePath);
         File.WriteAllText(path, json);
     }
 
@@ -62,7 +74,7 @@ public static class ObjectExtension
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
 
-        var path = Path.Combine(Application.dataPath, _RelativePath);
+        var path = Path.Combine(Application.streamingAssetsPath, _RelativePath);
         var fileContent = File.ReadAllText(path);
         var deserializedObject = JsonConvert.DeserializeObject<T>(fileContent);
 
