@@ -1,11 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
 using System.Reflection;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(MonoBehaviour), true)]
 public class SetterUpdaterEditor : Editor
 {
+    enum PropertyState
+    {
+        firstSave,
+        modified,
+        unchanged
+    }
+
+    private readonly Dictionary<string, object> storedReferenceValues = new Dictionary<string, object>();
     private string trimGeneratedSetterName(string _PropertyName)
     {
         string prefix = _PropertyName.Substring(0, 4);
@@ -22,28 +30,55 @@ public class SetterUpdaterEditor : Editor
         return _PropertyName;
     }
 
+    private PropertyState compareProperty(string key, object value)
+    {
+        object reference;
+        if( storedReferenceValues.TryGetValue(key, out reference))
+        {
+            if(reference != value)
+            {
+                storedReferenceValues[key] = value;
+                return PropertyState.modified;
+            }
+            else
+            {
+                return PropertyState.unchanged;
+            }
+        }
+        else
+        {
+            storedReferenceValues.Add(key, value );
+            return PropertyState.firstSave;
+        }
+    }
+
     private void executeSetters()
     {
-        PropertyInfo[] Setters = serializedObject.targetObject.GetType().GetProperties();
-        foreach (PropertyInfo setter in Setters)
+        PropertyInfo[] setters = serializedObject.targetObject.GetType().GetProperties();
+        foreach (PropertyInfo setter in setters)
         {
             try
             {
                 MethodInfo setterMethodProperty = setter.GetSetMethod();
                 if (setterMethodProperty != null)
-                {
+                {                   
                     string propertyName = trimGeneratedSetterName(setterMethodProperty.Name);
-                    setterMethodProperty.Invoke(
-                        serializedObject.targetObject, new object[] {
-                            serializedObject
+                    var propertyValue = serializedObject
                             .targetObject
                             .GetType()
                             .GetField(propertyName, BindingFlags.NonPublic | BindingFlags.Instance)
-                            .GetValue(serializedObject.targetObject)
-                        });
+                            .GetValue(serializedObject.targetObject);
+                    var state = compareProperty(propertyName, propertyValue);
+
+                    if (state == PropertyState.modified || state == PropertyState.firstSave){                      
+                        setterMethodProperty.Invoke(
+                            serializedObject.targetObject, new object[] {
+                                propertyValue
+                            });
+                    }
                 }
             }
-            catch{ } //ignore because property did not exist
+            catch{ } //ignore because property does not exist
         }
     }
 

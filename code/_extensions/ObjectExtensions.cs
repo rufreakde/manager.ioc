@@ -6,6 +6,8 @@
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 #endregion
 
 public interface IJsonSerialize<T>
@@ -33,6 +35,22 @@ public static class ObjectExtension
     public static object GetPropValue(this string _PropertyName, object _Source)
     {
         return _Source.GetType().GetProperty(_PropertyName).GetValue(_Source, null);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /********************
+     * Deep Clone an object with Binary Formatter  *
+     ********************/
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static T DeepClone<T>(this T a) where T : ISerializable
+    {
+        using (MemoryStream stream = new MemoryStream())
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, a);
+            stream.Position = 0;
+            return (T)formatter.Deserialize(stream);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
